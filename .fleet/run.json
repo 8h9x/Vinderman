@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "go",
+            "name": "Go configuration",
+            "goExecPath": "C:\\Program Files\\Go\\bin\\go.exe",
+            "buildParams": [],
+        },
+        
+    ]
+}
