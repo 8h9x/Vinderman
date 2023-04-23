@@ -81,7 +81,7 @@ func (c Client) GetExchangeCode(credentials UserCredentials) (exchange Exchange,
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
-	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/exchange", headers, "")
+	resp, err := c.Request("GET", consts.ACCOUNT_AUTH+"/exchange", headers, "")
 	if err != nil {
 		return
 	}

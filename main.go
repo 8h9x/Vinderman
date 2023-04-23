@@ -1,18 +1,14 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/0xDistrust/Vinderman/consts"
 	"github.com/0xDistrust/Vinderman/eos"
 	"github.com/0xDistrust/Vinderman/external/fnapicom"
 	"github.com/0xDistrust/Vinderman/external/nitestats"
-	"github.com/0xDistrust/Vinderman/request"
 )
 
 type Client struct {
