@@ -393,7 +393,7 @@ type Theater2ProfileStats struct {
 }
 
 type AthenaCosmeticItem struct {
-	TemplateId string `json:"templateId"`
+	TemplateID string `json:"templateId"`
 	Attributes struct {
 		Favorite      bool `json:"favorite,omitempty"`
 		Archived      bool `json:"archived,omitempty"`
