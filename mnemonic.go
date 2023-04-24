@@ -19,8 +19,8 @@ type MnemonicInfo struct {
 	LinkType        string    `json:"linkType"`
 	Metadata        struct {
 		DynamicXp struct {
-			CalibrationPhase string `json:"calibrationPhase"`
-			// UniqueGameVersion string `json:"uniqueGameVersion"` // somtimes int, sometimes string
+			CalibrationPhase string       `json:"calibrationPhase"`
+			UniqueGameVersion interface{} `json:"uniqueGameVersion"` // somtimes int, sometimes string, huge pain
 		} `json:"dynamicXp"`
 		GeneratedIslandUrlsOld struct {
 			URL  string `json:"url"`
