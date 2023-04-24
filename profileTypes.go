@@ -1,4 +1,4 @@
-package main
+package vinderman
 
 type AthenaProfileStats struct {
 	Attributes struct {
