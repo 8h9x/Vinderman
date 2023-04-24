@@ -75,7 +75,7 @@ func (c Client) AddFriend(credentials UserCredentials, friendID string) (err err
 	return
 }
 
-func (c Client) FetchFriend(credentials UserCredentials, friendID string) (friendship Friend, err error) {
+func (c Client) FetchFriend(credentials UserCredentials, friendID string) (friend Friend, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
@@ -89,7 +89,7 @@ func (c Client) FetchFriend(credentials UserCredentials, friendID string) (frien
 	return res.Body, err
 }
 
-func (c Client) FetchFriends(credentials UserCredentials) (friendship []Friend, err error) {
+func (c Client) FetchFriends(credentials UserCredentials) (friends []Friend, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
@@ -113,7 +113,7 @@ func (c Client) RemoveFriend(credentials UserCredentials, friendID string) (err 
 	}
 
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("failed to remove friend: %s", resp.Status)
+		err = fmt.Errorf("failed to remove friend: %s", resp.Status)
 	}
 
 	return
@@ -129,7 +129,7 @@ func (c Client) RemoveFriendsBulk(credentials UserCredentials) (err error) {
 	}
 
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("failed to remove friends: %s", resp.Status)
+		err = fmt.Errorf("failed to remove friends: %s", resp.Status)
 	}
 
 	return
@@ -145,7 +145,7 @@ func (c Client) SetFriendNickname(credentials UserCredentials, friendID string, 
 	}
 
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("failed to set friend nickname: %s", resp.Status)
+		err = fmt.Errorf("failed to set friend nickname: %s", resp.Status)
 	}
 
 	return
@@ -161,13 +161,13 @@ func (c Client) RemoveFriendNickname(credentials UserCredentials, friendID strin
 	}
 
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("failed to remove friend nickname: %s", resp.Status)
+		err = fmt.Errorf("failed to remove friend nickname: %s", resp.Status)
 	}
 
 	return
 }
 
-func (c Client) FetchFriendsSummary(credentials UserCredentials) (friendship FriendsSummary, err error) {
+func (c Client) FetchFriendsSummary(credentials UserCredentials) (friendsSummary FriendsSummary, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
@@ -181,7 +181,7 @@ func (c Client) FetchFriendsSummary(credentials UserCredentials) (friendship Fri
 	return res.Body, err
 }
 
-func (c Client) FetchFriendsIncoming(credentials UserCredentials) (friendship []Friend, err error) {
+func (c Client) FetchFriendsIncoming(credentials UserCredentials) (friendsIncoming []Friend, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
@@ -195,7 +195,7 @@ func (c Client) FetchFriendsIncoming(credentials UserCredentials) (friendship []
 	return res.Body, err
 }
 
-func (c Client) FetchFriendsOutgoing(credentials UserCredentials) (friendship []Friend, err error) {
+func (c Client) FetchFriendsOutgoing(credentials UserCredentials) (friendsOutgoing []Friend, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
@@ -209,7 +209,7 @@ func (c Client) FetchFriendsOutgoing(credentials UserCredentials) (friendship []
 	return res.Body, err
 }
 
-func (c Client) FetchFriendsSuggested(credentials UserCredentials) (friendship []SuggestedFriend, err error) {
+func (c Client) FetchFriendsSuggested(credentials UserCredentials) (friendsSuggested []SuggestedFriend, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 

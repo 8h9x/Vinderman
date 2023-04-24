@@ -58,6 +58,24 @@ type UserSearchData struct {
 	SortPosition int    `json:"sortPosition"`
 }
 
+func (c Client) FetchMe(credentials UserCredentials) (UserLookup, error) {
+	return c.FetchUserByID(credentials, credentials.AccountID)
+}
+
+func (c Client) FetchUserByID(credentials UserCredentials, accountID string) (userLookup UserLookup, err error) {
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer "+credentials.AccessToken)
+
+	resp, err := c.Request("GET", fmt.Sprintf("%s/account/api/public/account/%s", consts.ACCOUNT_SERVICE, accountID), headers, "")
+	if err != nil {
+		return
+	}
+
+	res, err := request.ResponseParser[UserLookup](resp)
+
+	return res.Body, err
+}
+
 func (c Client) FetchUserByDisplayName(credentials UserCredentials, displayName string) (userLookup UserLookup, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer "+credentials.AccessToken)
@@ -66,7 +84,7 @@ func (c Client) FetchUserByDisplayName(credentials UserCredentials, displayName 
 	if err != nil {
 		return
 	}
-	
+
 	res, err := request.ResponseParser[UserLookup](resp)
 
 	return res.Body, err

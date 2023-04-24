@@ -47,16 +47,16 @@ func (c Client) ComposeProfileOperation(credentials UserCredentials, operation s
 	return
 }
 
-func (c Client) ProfileOperation(credentials UserCredentials, operation string, profileId string, payload any) (any, error) {
+func (c Client) ProfileOperation(credentials UserCredentials, operation string, profileId string, payload any) (resp *http.Response, err error) {
 	bodyBytes, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	return c.ComposeProfileOperation(credentials, operation, profileId, string(bodyBytes))
 }
 
-func (c Client) QueryProfile(credentials UserCredentials, profileId string) (any, error) {
+func (c Client) QueryProfile(credentials UserCredentials, profileId string) (*http.Response, error) {
 	return c.ProfileOperation(credentials, "QueryProfile", profileId, "{}")
 }
 
