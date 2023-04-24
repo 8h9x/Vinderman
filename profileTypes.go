@@ -410,3 +410,11 @@ type AthenaCosmeticItem struct {
 	} `json:"attributes"`
 	Quantity   int    `json:"quantity"`
 }
+
+type CommonCoreMtxItem struct {
+	TemplateID string `json:"templateId"`
+	Quantity   int    `json:"quantity"`
+	Attributes struct {
+		Platform string `json:"platform"`
+	} `json:"attributes"`
+}

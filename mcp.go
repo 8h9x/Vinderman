@@ -56,18 +56,37 @@ func (c Client) ProfileOperation(credentials UserCredentials, operation string, 
 	return c.ComposeProfileOperation(credentials, operation, profileId, string(bodyBytes))
 }
 
+func (c Client) QueryProfile(credentials UserCredentials, profileId string) (any, error) {
+	return c.ProfileOperation(credentials, "QueryProfile", profileId, "{}")
+}
+
 //func ProfileOperationExample() () {
 //	client := New()
-//	res, err := client.ComposeProfileOperation(UserCredentials{}, "QueryProfile", "athena", "{}")
+//
+//	res, err := client.QueryProfile(UserCredentials{}, "athena")
 //	if err != nil {
-//		log.Println(err)
+//		log.Fatal(err)
 //	}
 //
 //	data, err := request.ResponseParser[Profile[AthenaProfileStats]](res)
 //	if err != nil {
-//		log.Println(err)
+//		log.Fatal(err)
 //	}
 //
-//	log.Println(data.Body.ProfileChanges[0].Profile.Stats.Attributes.AccountLevel)
-//	log.Println(data.Body.ProfileChanges[0].Profile.Items[""].(AthenaCosmeticItem).TemplateId)
+//	var skins []AthenaCosmeticItem
+//
+//	for _, item := range data.Body.ProfileChanges[0].Profile.Items {
+//		var cosmetic AthenaCosmeticItem
+//		if err = json.Unmarshal(item, &cosmetic); err != nil {
+//			// not a skin; (you should probably add an additional check to ensure that it isnt some other type of error occurring); TODO: abstract this to a helper function that properly error checks and returns an empty state of the type passed if the type of data doesnt match
+//			continue
+//		}
+//
+//		if strings.HasPrefix(cosmetic.TemplateID, "AthenaCharacter") {
+//			skins = append(skins, cosmetic)
+//		}
+//	}
+//
+//	log.Println("Account Level:", data.Body.ProfileChanges[0].Profile.Stats.Attributes.AccountLevel)
+//	log.Println("Skin Count:", len(skins))
 //}
