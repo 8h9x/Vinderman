@@ -45,7 +45,7 @@ type AthenaProfileStats struct {
 			NumLowBracket  int64 `json:"numLowBracket"`
 		} `json:"season"`
 		Battlestars int64 `json:"battlestars"`
-		VoteData   struct {
+		VoteData    struct {
 			ElectionId  string `json:"electionId"`
 			VoteHistory map[string]struct {
 				VoteCount   int64  `json:"voteCount"`
@@ -392,6 +392,18 @@ type Theater2ProfileStats struct {
 	} `json:"attributes"`
 }
 
+type CampaignNotifications []struct {
+	Type         string `json:"type"`
+	Primary      bool   `json:"primary"`
+	DaysLoggedIn int    `json:"daysLoggedIn"`
+	Items        []struct {
+		ItemType    string `json:"itemType"`
+		ItemGuid    string `json:"itemGuid"`
+		ItemProfile string `json:"itemProfile"`
+		Quantity    int    `json:"quantity"`
+	} `json:"items"`
+}
+
 type AthenaCosmeticItem struct {
 	TemplateID string `json:"templateId"`
 	Attributes struct {
@@ -408,7 +420,7 @@ type AthenaCosmeticItem struct {
 		} `json:"variants,omitempty"`
 		XP int `json:"xp"`
 	} `json:"attributes"`
-	Quantity   int    `json:"quantity"`
+	Quantity int `json:"quantity"`
 }
 
 type CommonCoreMtxItem struct {

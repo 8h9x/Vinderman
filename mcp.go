@@ -14,7 +14,7 @@ type ProfileStatsType interface {
 		CommonCoreProfileStats | CreativeProfileStats | MetadataProfileStats | OutpostProfileStats | RecycleBinProfileStats | Theater0ProfileStats | Theater1ProfileStats | Theater2ProfileStats
 }
 
-type Profile[T ProfileStatsType] struct {
+type Profile[ST ProfileStatsType, NT CampaignNotifications | []interface{}] struct {
 	ProfileRevision            int    `json:"profileRevision"`
 	ProfileID                  string `json:"profileId"`
 	ProfileChangesBaseRevision int    `json:"profileChangesBaseRevision"`
@@ -29,13 +29,14 @@ type Profile[T ProfileStatsType] struct {
 			ProfileID       string                     `json:"profileId"`
 			Version         string                     `json:"version"`
 			Items           map[string]json.RawMessage `json:"items"`
-			Stats           T                          `json:"stats"`
+			Stats           ST                         `json:"stats"`
 			CommandRevision int                        `json:"commandRevision"`
 		} `json:"profile"`
 	} `json:"profileChanges"`
 	ProfileCommandRevision int       `json:"profileCommandRevision"`
 	ServerTime             time.Time `json:"serverTime"`
 	ResponseVersion        int       `json:"responseVersion"`
+	Notifications          NT        `json:"notifications"`
 }
 
 type AbandonExpeditionPayload struct {
