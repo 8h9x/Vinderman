@@ -212,7 +212,7 @@ func (c Client) ComposeProfileOperation(credentials UserCredentials, operation s
 	headers.Set("Content-Type", "application/json")
 	headers.Set("Authorization", "Bearer "+credentials.AccessToken)
 
-	resp, err = c.Request("POST", fmt.Sprintf("%s/profile/%s/client/%s?profileID=%s&rvn=-1", consts.FORTNITE_GAME, credentials.AccountID, operation, profileID), headers, payload)
+	resp, err = c.Request("POST", fmt.Sprintf("%s/profile/%s/client/%s?profileId=%s&rvn=-1", consts.FORTNITE_GAME, credentials.AccountID, operation, profileID), headers, payload)
 	return
 }
 
