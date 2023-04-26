@@ -57,7 +57,7 @@ func (c Client) ProfileOperation(credentials UserCredentials, operation string, 
 }
 
 func (c Client) QueryProfile(credentials UserCredentials, profileId string) (*http.Response, error) {
-	return c.ProfileOperation(credentials, "QueryProfile", profileId, "{}")
+	return c.ComposeProfileOperation(credentials, "QueryProfile", profileId, "{}")
 }
 
 //func ProfileOperationExample() () {
