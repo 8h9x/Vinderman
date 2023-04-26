@@ -16,7 +16,7 @@ type ProfileStatsType interface {
 
 type Profile[T ProfileStatsType] struct {
 	ProfileRevision            int    `json:"profileRevision"`
-	ProfileID                  string `json:"profileID"`
+	ProfileID                  string `json:"profileId"`
 	ProfileChangesBaseRevision int    `json:"profileChangesBaseRevision"`
 	ProfileChanges             []struct {
 		ChangeType string `json:"changeType"`
@@ -25,8 +25,8 @@ type Profile[T ProfileStatsType] struct {
 			Updated         string                     `json:"updated"`
 			RVN             int                        `json:"rvn"`
 			WipeNumber      int                        `json:"wipeNumber"`
-			AccountId       string                     `json:"accountId"`
-			ProfileId       string                     `json:"profileID"`
+			AccountID       string                     `json:"accountId"`
+			ProfileID       string                     `json:"profileId"`
 			Version         string                     `json:"version"`
 			Items           map[string]json.RawMessage `json:"items"`
 			Stats           T                          `json:"stats"`
@@ -73,8 +73,8 @@ type AssignHeroToLoadoutPayload struct {
 }
 
 type AssignTeamPerkToLoadoutPayload struct {
-	TeamPerkId string `json:"teamPerkId"`
-	LoadoutId  string `json:"loadoutId"`
+	TeamPerkID string `json:"teamPerkId"`
+	LoadoutID  string `json:"loadoutId"`
 }
 
 type AssignWorkerToSquadPayload struct {
