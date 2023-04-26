@@ -38,6 +38,40 @@ type Profile[T ProfileStatsType] struct {
 	ResponseVersion        int       `json:"responseVersion"`
 }
 
+type AbandonExpeditionPayload struct {
+	ExpeditionID string `json:"expeditionId"`
+}
+
+type ActivateConsumablePayload struct {
+	TargetItemID    string `json:"targetItemId"`
+	TargetAccountID string `json:"targetAccountId"`
+}
+
+type AddToCollectionPayload struct {
+	Category    string              `json:"category"`
+	Variant     string              `json:"variant"`
+	ContextTags []string            `json:"contextTags"`
+	Properties  interface{}         `json:"properties"`
+	SeenState   EFortCollectedState `json:"seenState"`
+	Count       int                 `json:"count"`
+}
+
+type ApplyVotePayload struct {
+	OfferID string `json:"offerId"`
+}
+
+type AssignGadgetToLoadoutPayload struct {
+	GadgetID  string `json:"gadgetId"`
+	LoadoutID string `json:"loadoutId"`
+	SlotIndex uint8  `json:"slotIndex"` // either 0 or 1
+}
+
+type AssignHeroToLoadoutPayload struct {
+	HeroID    string `json:"heroId"`
+	LoadoutID string `json:"loadoutId"`
+	SlotIndex uint8  `json:"slotIndex"` // either 0 or 1
+}
+
 func (c Client) ComposeProfileOperation(credentials UserCredentials, operation string, profileID string, payload string) (resp *http.Response, err error) {
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/json")
@@ -54,6 +88,34 @@ func (c Client) ProfileOperation(credentials UserCredentials, operation string, 
 	}
 
 	return c.ComposeProfileOperation(credentials, operation, profileId, string(bodyBytes))
+}
+
+func (c Client) AbandonExpedition(credentials UserCredentials, expeditionId string) (*http.Response, error) {
+	return c.ProfileOperation(credentials, "AbandonExpedition", "campaign", AbandonExpeditionPayload{
+		ExpeditionID: expeditionId,
+	})
+}
+
+func (c Client) ActivateConsumable(credentials UserCredentials, payload ActivateConsumablePayload) (*http.Response, error) {
+	return c.ProfileOperation(credentials, "ActivateConsumable", "campaign", payload)
+}
+
+func (c Client) AddToCollection(credentials UserCredentials, payload AddToCollectionPayload) (*http.Response, error) {
+	return c.ProfileOperation(credentials, "AddToCollection", "collections", payload)
+}
+
+func (c Client) ApplyVote(credentials UserCredentials, offerID string) (*http.Response, error) {
+	return c.ProfileOperation(credentials, "ApplyVote", "athena", ApplyVotePayload{
+		OfferID: offerID,
+	})
+}
+
+func (c Client) AssignGadgetToLoadout(credentials UserCredentials, payload AssignGadgetToLoadoutPayload) (*http.Response, error) {
+	return c.ProfileOperation(credentials, "AssignGadgetToLoadout", "campaign", payload)
+}
+
+func (c Client) AssignHeroToLoadout(credentials UserCredentials, payload AssignHeroToLoadoutPayload) (*http.Response, error) {
+	return c.ProfileOperation(credentials, "AssignGadgetToLoadout", "campaign", payload)
 }
 
 func (c Client) QueryProfile(credentials UserCredentials, profileId string) (*http.Response, error) {
