@@ -969,7 +969,7 @@ func (c Client) UpgradeSlottedItem(credentials UserCredentials, profileID string
 }
 
 func (c Client) VerifyRealMoneyPurchase(credentials UserCredentials, payload VerifyRealMoneyPurchasePayload) (*http.Response, error) {
-	return c.ProfileOperation(credentials, "UpgradeSlottedItem", "common_core", payload)
+	return c.ProfileOperation(credentials, "VerifyRealMoneyPurchase", "common_core", payload)
 }
 
 //func ProfileOperationExample() () {
