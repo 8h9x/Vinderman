@@ -38,3 +38,34 @@ const (
 	ESocialImportPanelPlatformPlaystation ESocialImportPanelPlatform = "Playstation"
 	ESocialImportPanelPlatformSwitch      ESocialImportPanelPlatform = "Switch"
 )
+
+type RealMoneyPurchaseRefreshType string
+
+const (
+	RealMoneyPurchaseRefreshTypeDefault           RealMoneyPurchaseRefreshType = "Default"
+	RealMoneyPurchaseRefreshTypeForceAll          RealMoneyPurchaseRefreshType = "ForceAll"
+	RealMoneyPurchaseRefreshTypeForceCurrent      RealMoneyPurchaseRefreshType = "ForceCurrent"
+	RealMoneyPurchaseRefreshTypeUpdateOfflineAuth RealMoneyPurchaseRefreshType = "UpdateOfflineAuth"
+)
+
+type RealMoneyPurchaseVerifierModeOverride string
+
+const (
+	RealMoneyPurchaseVerifierModeOverrideDefaultToConfig              RealMoneyPurchaseVerifierModeOverride = "DefaultToConfig"
+	RealMoneyPurchaseVerifierModeOverrideOccurrenceOnly               RealMoneyPurchaseVerifierModeOverride = "OccurrenceOnly"
+	RealMoneyPurchaseVerifierModeOverrideOccurrenceOnlyRemoveReceipts RealMoneyPurchaseVerifierModeOverride = "OccurrenceOnlyRemoveReceipts"
+	RealMoneyPurchaseVerifierModeOverrideOccurrencePrimary            RealMoneyPurchaseVerifierModeOverride = "OccurrencePrimary"
+	RealMoneyPurchaseVerifierModeOverrideReceiptOnly                  RealMoneyPurchaseVerifierModeOverride = "ReceiptOnly"
+	RealMoneyPurchaseVerifierModeOverrideReceiptPrimary               RealMoneyPurchaseVerifierModeOverride = "ReceiptPrimary"
+)
+
+type ExternalAuthType string
+
+const (
+	ExternalAuthTypeSteam    ExternalAuthType = "steam"
+	ExternalAuthTypeGithub   ExternalAuthType = "github"
+	ExternalAuthTypeTwitch   ExternalAuthType = "twitch"
+	ExternalAuthTypeXBL      ExternalAuthType = "xbl"
+	ExternalAuthTypePSN      ExternalAuthType = "psn"
+	ExternalAuthTypeNintendo ExternalAuthType = "nintendo"
+)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-	
+
 	"github.com/0xDistrust/Vinderman/consts"
 	"github.com/0xDistrust/Vinderman/request"
 )
@@ -90,10 +90,10 @@ func (c Client) FetchUserByDisplayName(credentials UserCredentials, displayName 
 	return res.Body, err
 }
 
-func (c Client) FetchUserByExternalDisplayName(credentials UserCredentials, displayName string, platform string) (userExternalLookup UserExternalLookup, err error) {
+func (c Client) FetchUserByExternalDisplayName(credentials UserCredentials, displayName string, platform ExternalAuthType) (userExternalLookup UserExternalLookup, err error) {
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer "+credentials.AccessToken)
-	
+
 	resp, err := c.Request("GET", fmt.Sprintf("%s/account/api/public/account/lookup/externalAuth/%s/displayName/%s?caseInsensitive=true", consts.ACCOUNT_SERVICE, platform, displayName), headers, "")
 	if err != nil {
 		return
@@ -104,10 +104,10 @@ func (c Client) FetchUserByExternalDisplayName(credentials UserCredentials, disp
 	return res.Body, err
 }
 
-func (c Client) SearchUsers(credentials UserCredentials, displayName string, platform string) (offers []UserSearchData, err error) {
+func (c Client) SearchUsers(credentials UserCredentials, displayName string, platform ExternalAuthType) (offers []UserSearchData, err error) {
 	values := url.Values{}
 	values.Add("prefix", displayName)
-	values.Add("platform", platform)
+	values.Add("platform", string(platform))
 
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer "+credentials.AccessToken)
