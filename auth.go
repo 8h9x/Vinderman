@@ -31,14 +31,15 @@ type Exchange eos.Exchange
 type UserCredentials struct {
 	AccessToken      string    `json:"access_token"`
 	AccountID        string    `json:"account_id"`
-	ApplicationId    string    `json:"application_id"`
-	ClientId         string    `json:"client_id"`
+	ClientID         string    `json:"client_id"`
+	ClientService    string    `json:"client_service"`
+	DisplayName      string    `json:"displayName"`
 	ExpiresAt        time.Time `json:"expires_at"`
 	ExpiresIn        int       `json:"expires_in"`
+	ProductID        string    `json:"product_id"`
 	RefreshExpiresAt time.Time `json:"refresh_expires_at"`
-	RefreshExpiresIn int       `json:"refresh_expires_in"`
+	RefreshExpiresIn int       `json:"refresh_expires"`
 	RefreshToken     string    `json:"refresh_token"`
-	Scope            []string  `json:"scope"`
 	TokenType        string    `json:"token_type"`
 }
 
