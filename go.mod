@@ -1,3 +1,3 @@
 module github.com/0xDistrust/Vinderman
 
-go 1.19
+go 1.24

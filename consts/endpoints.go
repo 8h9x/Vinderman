@@ -10,7 +10,7 @@ const (
 	EULA_SERVICE             = "https://eulatracking-public-service-prod-m.ol.epicgames.com"
 	EVENTS_SERVICE           = "https://events-public-service-live.ol.epicgames.com"
 	FORTNITE_CONTENT_WEBSITE = "https://fortnitecontent-website-prod07.ol.epicgames.com"
-	FORTNITE_SERVICE         = "https://fngw-mcp-gc-livefn.ol.epicgames.com/fortnite/api"
+	FORTNITE_SERVICE         = "https://fngw-mcp-gc-livefn.ol.epicgames.com/"
 	FRIENDS_SERVICE          = "https://friends-public-service-prod.ol.epicgames.com"
 	LIGHTSWITCH_SERVICE      = "https://lightswitch-public-service-prod06.ol.epicgames.com"
 	LINKS_SERVICE            = "https://links-public-service-live.ol.epicgames.com"
@@ -19,9 +19,9 @@ const (
 	STATS_SERVICE            = "https://statsproxy-public-service-live.ol.epicgames.com"
 	USERSEARCH_SERVICE       = "https://user-search-service-prod.ol.epicgames.com"
 
-	ACCOUNT_AUTH         = ACCOUNT_SERVICE + "/account/api/oauth"
-	EOS_AUTH             = EOS_SERVICE + "/oauth/v2"
-	FORTNITE_GAME        = FORTNITE_SERVICE + "/game/v2"
+	ACCOUNT_AUTH  = ACCOUNT_SERVICE + "/account/api/oauth"
+	EOS_AUTH      = EOS_SERVICE + "/oauth/v2"
+	FORTNITE_GAME = FORTNITE_SERVICE + "/fortnite/api/game/v2"
 
 	NITESTATS_API = "https://api.nitestats.com/v1/epic"
 	FNAPICOM_API  = ""

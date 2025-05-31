@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	
+
 	"github.com/0xDistrust/Vinderman/consts"
 	"github.com/0xDistrust/Vinderman/request"
 )
@@ -55,7 +55,7 @@ func (c Client) FetchCatalog(credentials UserCredentials) (catalog Catalog, err 
 	headers := http.Header{}
 	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
 
-	resp, err := c.Request("POST", consts.FORTNITE_SERVICE+"/storefront/v2/catalog", headers, "")
+	resp, err := c.Request("POST", consts.FORTNITE_SERVICE+"/fortnite/api/storefront/v2/catalog", headers, "")
 	if err != nil {
 		return
 	}
