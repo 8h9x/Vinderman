@@ -11,7 +11,7 @@ import (
 
 type ProfileStatsType interface {
 	AthenaProfileStats | CampaignProfileStats | CollectionBookPeopleProfileStats | CollectionBookSchematicsProfileStats | CollectionsProfileStats | CommonPublicProfileStats |
-		CommonCoreProfileStats | CreativeProfileStats | MetadataProfileStats | OutpostProfileStats | RecycleBinProfileStats | Theater0ProfileStats | Theater1ProfileStats | Theater2ProfileStats
+	CommonCoreProfileStats | CreativeProfileStats | MetadataProfileStats | OutpostProfileStats | RecycleBinProfileStats | Theater0ProfileStats | Theater1ProfileStats | Theater2ProfileStats
 }
 
 type Profile[ST ProfileStatsType, NT CampaignNotifications | []interface{}] struct {
@@ -834,22 +834,22 @@ func (c Client) SetAffiliateNameLoadout(credentials UserCredentials, affiliateNa
 	return c.ProfileOperation(credentials, "SetActiveHeroLoadout", "common_core", SetAffiliateNamePayload{AffiliateName: affiliateName})
 }
 
-// SetCosmeticLockerBanner athena, campaign
+// Deprecated: SetCosmeticLockerBanner Modern versions of the fortnite mcp system use a separate locker api--use locker.UpdateActiveLockerLoadout()
 func (c Client) SetCosmeticLockerBanner(credentials UserCredentials, profileID string, payload SetCosmeticLockerBannerPayload) (*http.Response, error) {
 	return c.ProfileOperation(credentials, "SetCosmeticLockerBanner", profileID, payload)
 }
 
-// SetCosmeticLockerName athena, campaign
+// Deprecated: SetCosmeticLockerName Modern versions of the fortnite mcp system use a separate locker api--use locker.UpdateActiveLockerLoadout()
 func (c Client) SetCosmeticLockerName(credentials UserCredentials, profileID string, payload SetCosmeticLockerNamePayload) (*http.Response, error) {
 	return c.ProfileOperation(credentials, "SetCosmeticLockerName", profileID, payload)
 }
 
-// SetCosmeticLockerSlot athena, campaign
+// Deprecated: SetCosmeticLockerSlot Modern versions of the fortnite mcp system use a separate locker api--use locker.UpdateActiveLockerLoadout()
 func (c Client) SetCosmeticLockerSlot(credentials UserCredentials, profileID string, payload SetCosmeticLockerSlotPayload) (*http.Response, error) {
 	return c.ProfileOperation(credentials, "SetCosmeticLockerSlot", profileID, payload)
 }
 
-// SetCosmeticLockerSlots athena, campaign
+// Deprecated: SetCosmeticLockerSlots Modern versions of the fortnite mcp system use a separate locker api--use locker.UpdateActiveLockerLoadout()
 func (c Client) SetCosmeticLockerSlots(credentials UserCredentials, profileID string, payload SetCosmeticLockerSlotsPayload) (*http.Response, error) {
 	return c.ProfileOperation(credentials, "SetCosmeticLockerSlots", profileID, payload)
 }
@@ -870,6 +870,7 @@ func (c Client) SetHomebaseBanner(credentials UserCredentials, payload SetHomeba
 	return c.ProfileOperation(credentials, "SetHomebaseBanner", "common_public", payload)
 }
 
+// Deprecated: SetHomebaseName The home base naming system has been removed from the game.
 func (c Client) SetHomebaseName(credentials UserCredentials, homebaseName string) (*http.Response, error) {
 	return c.ProfileOperation(credentials, "SetHomebaseName", "common_core", SetHomebaseNamePayload{HomebaseName: homebaseName})
 }
