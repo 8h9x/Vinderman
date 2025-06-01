@@ -1,16 +1,29 @@
 package vinderman
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/0xDistrust/Vinderman/consts"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/0xDistrust/Vinderman/common"
 	"github.com/0xDistrust/Vinderman/eos"
 	"github.com/0xDistrust/Vinderman/request"
 )
+
+type AuthClient struct {
+	ClientId     string
+	ClientSecret string
+}
+
+func (ac *AuthClient) String() string {
+	return fmt.Sprintf("AuthClient{ClientId: %s}", ac.ClientId)
+}
+
+func (ac *AuthClient) BasicToken() string {
+	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ac.ClientId, ac.ClientSecret)))
+}
 
 type ClientCredentials eos.ClientCredentials
 
@@ -56,12 +69,10 @@ func (c Client) CreateDeviceAuth(credentials UserCredentials) (deviceAuth Device
 	return res.Body, err
 }
 
-func (c Client) GetClientCredentials(clientId string, clientSecret string) (credentials ClientCredentials, err error) {
-	encodedClientToken := common.Base64Encode(clientId + ":" + clientSecret)
-
+func (c Client) GetClientCredentials(ac AuthClient) (credentials ClientCredentials, err error) {
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", encodedClientToken))
+	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
 
 	v := url.Values{}
 	v.Set("grant_type", "client_credentials")
@@ -91,12 +102,10 @@ func (c Client) GetExchangeCode(credentials UserCredentials) (exchange Exchange,
 	return res.Body, err
 }
 
-func (c Client) RefreshTokenLogin(clientId string, clientSecret string, refreshToken string) (credentials UserCredentials, err error) {
-	encodedClientToken := common.Base64Encode(clientId + ":" + clientSecret)
-
+func (c Client) RefreshTokenLogin(ac AuthClient, refreshToken string) (credentials UserCredentials, err error) {
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", encodedClientToken))
+	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
 
 	v := url.Values{}
 	v.Set("grant_type", "refresh_token")
@@ -113,12 +122,10 @@ func (c Client) RefreshTokenLogin(clientId string, clientSecret string, refreshT
 	return res.Body, err
 }
 
-func (c Client) ExchangeCodeLogin(clientId string, clientSecret string, code string) (credentials UserCredentials, err error) {
-	encodedClientToken := common.Base64Encode(clientId + ":" + clientSecret)
-
+func (c Client) ExchangeCodeLogin(ac AuthClient, code string) (credentials UserCredentials, err error) {
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", encodedClientToken))
+	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
 
 	v := url.Values{}
 	v.Set("grant_type", "exchange_code")

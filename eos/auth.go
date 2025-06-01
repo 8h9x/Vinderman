@@ -1,12 +1,12 @@
 package eos
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/0xDistrust/Vinderman/common"
 	"github.com/0xDistrust/Vinderman/consts"
 	"github.com/0xDistrust/Vinderman/request"
 )
@@ -52,7 +52,7 @@ type Exchange struct {
 }
 
 func (c Client) DeviceCodeLogin(clientId string, clientSecret string, deviceCode string) (credentials UserCredentials, err error) {
-	encodedClientToken := common.Base64Encode(clientId + ":" + clientSecret)
+	encodedClientToken := Base64Encode(clientId + ":" + clientSecret)
 
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -74,7 +74,7 @@ func (c Client) DeviceCodeLogin(clientId string, clientSecret string, deviceCode
 }
 
 func (c Client) ExchangeCodeLogin(clientId string, clientSecret string, code string) (credentials UserCredentials, err error) {
-	encodedClientToken := common.Base64Encode(clientId + ":" + clientSecret)
+	encodedClientToken := Base64Encode(clientId + ":" + clientSecret)
 
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -97,7 +97,7 @@ func (c Client) ExchangeCodeLogin(clientId string, clientSecret string, code str
 }
 
 func (c Client) GetClientCredentials(clientId string, clientSecret string) (credentials ClientCredentials, err error) {
-	encodedClientToken := common.Base64Encode(clientId + ":" + clientSecret)
+	encodedClientToken := Base64Encode(clientId + ":" + clientSecret)
 
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -152,15 +152,19 @@ func (c Client) GetDeviceCode(credentials ClientCredentials) (deviceAuth DeviceA
 
 func (c Client) WaitForDeviceCodeAccept(clientId string, clientSecret string, deviceCode string) (credentials UserCredentials, err error) {
 	credentials, err = c.DeviceCodeLogin(clientId, clientSecret, deviceCode)
-	
+
 	if err != nil {
-		if err.(*request.Error[EpicErrorResponse]).Raw.ErrorCode == "errors.com.epicgames.account.oauth.authorization_pending" {
+		if err.(*request.Error[EpicErrorResponse]).Raw.ErrorCode == consts.ErrorAuthorizationPending {
 			time.Sleep(10 * time.Second)
 			return c.WaitForDeviceCodeAccept(clientId, clientSecret, deviceCode)
 		}
 
 		return
 	}
-	
+
 	return
+}
+
+func Base64Encode(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }

@@ -75,7 +75,7 @@ func (c Client) QueryLockerItems(credentials UserCredentials, deploymentId strin
 	headers.Set("Content-Type", "application/json")
 	headers.Set("Authorization", "Bearer "+credentials.AccessToken)
 
-	resp, err := c.Request("GET", fmt.Sprintf("%s/api/locker/v4/%s/account/%s/items", consts.FORTNITE_SERVICE, deploymentId, credentials.AccountID), headers, "")
+	resp, err := c.Request("GET", fmt.Sprintf("/%s/api/locker/v4/%s/account/%s/items", consts.FORTNITE_SERVICE, deploymentId, credentials.AccountID), headers, "")
 	if err != nil {
 		return LockerItems{}, err
 	}
@@ -96,7 +96,7 @@ func (c Client) UpdateActiveLockerLoadout(credentials UserCredentials, deploymen
 		return ActiveLoadoutGroup{}, err
 	}
 
-	resp, err := c.Request("PUT", fmt.Sprintf("%s/api/locker/v4/%s/account/%s/active-loadout-group", consts.FORTNITE_SERVICE, deploymentId, credentials.AccountID), headers, string(bodyBytes))
+	resp, err := c.Request("PUT", fmt.Sprintf("/%s/api/locker/v4/%s/account/%s/active-loadout-group", consts.FORTNITE_SERVICE, deploymentId, credentials.AccountID), headers, string(bodyBytes))
 	if err != nil {
 		return ActiveLoadoutGroup{}, err
 	}

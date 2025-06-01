@@ -10,7 +10,7 @@ const (
 	EULA_SERVICE             = "https://eulatracking-public-service-prod-m.ol.epicgames.com"
 	EVENTS_SERVICE           = "https://events-public-service-live.ol.epicgames.com"
 	FORTNITE_CONTENT_WEBSITE = "https://fortnitecontent-website-prod07.ol.epicgames.com"
-	FORTNITE_SERVICE         = "https://fngw-mcp-gc-livefn.ol.epicgames.com/"
+	FORTNITE_SERVICE         = "https://fngw-mcp-gc-livefn.ol.epicgames.com"
 	FRIENDS_SERVICE          = "https://friends-public-service-prod.ol.epicgames.com"
 	LIGHTSWITCH_SERVICE      = "https://lightswitch-public-service-prod06.ol.epicgames.com"
 	LINKS_SERVICE            = "https://links-public-service-live.ol.epicgames.com"
