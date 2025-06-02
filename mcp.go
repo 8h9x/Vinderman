@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/0xDistrust/Vinderman/consts"
+	"gitlab.com/8h9x/Vinderman/consts"
 )
 
 type ProfileStatsType interface {

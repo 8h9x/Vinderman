@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	
-	"github.com/0xDistrust/Vinderman/consts"
-	"github.com/0xDistrust/Vinderman/request"
+
+	"gitlab.com/8h9x/Vinderman/consts"
+	"gitlab.com/8h9x/Vinderman/request"
 )
 
 type MnemonicInfo struct {
@@ -19,7 +19,7 @@ type MnemonicInfo struct {
 	LinkType        string    `json:"linkType"`
 	Metadata        struct {
 		DynamicXp struct {
-			CalibrationPhase string       `json:"calibrationPhase"`
+			CalibrationPhase  string      `json:"calibrationPhase"`
 			UniqueGameVersion interface{} `json:"uniqueGameVersion"` // somtimes int, sometimes string, huge pain
 		} `json:"dynamicXp"`
 		GeneratedIslandUrlsOld struct {

@@ -3,8 +3,8 @@ package vinderman
 import (
 	"net/http"
 
-	"github.com/0xDistrust/Vinderman/eos"
-	"github.com/0xDistrust/Vinderman/external/fnapicom"
+	"gitlab.com/8h9x/Vinderman/eos"
+	"gitlab.com/8h9x/Vinderman/external/fnapicom"
 )
 
 type Client struct {

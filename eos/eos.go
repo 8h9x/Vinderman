@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/0xDistrust/Vinderman/request"
+	"gitlab.com/8h9x/Vinderman/request"
 )
 
 type Client struct {
@@ -32,7 +32,7 @@ func (c Client) Request(method string, url string, headers http.Header, body str
 	if err != nil {
 		return nil, err
 	}
-	
+
 	req.Header.Set("User-Agent", "FortniteGame/++Fortnite+Release-24.20-CL-25029190 Windows/10.0.22000.1.768.64bit")
 
 	for key, value := range headers {

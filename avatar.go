@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/0xDistrust/Vinderman/consts"
-	"github.com/0xDistrust/Vinderman/request"
+	"gitlab.com/8h9x/Vinderman/consts"
+	"gitlab.com/8h9x/Vinderman/request"
 )
 
 type Avatar struct {

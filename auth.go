@@ -3,13 +3,13 @@ package vinderman
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/0xDistrust/Vinderman/consts"
+	"gitlab.com/8h9x/Vinderman/consts"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/0xDistrust/Vinderman/eos"
-	"github.com/0xDistrust/Vinderman/request"
+	"gitlab.com/8h9x/Vinderman/eos"
+	"gitlab.com/8h9x/Vinderman/request"
 )
 
 type AuthClient struct {

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/0xDistrust/Vinderman/consts"
-	"github.com/0xDistrust/Vinderman/request"
+	"gitlab.com/8h9x/Vinderman/consts"
+	"gitlab.com/8h9x/Vinderman/request"
 )
 
 type Friend struct {
@@ -43,11 +43,11 @@ type SuggestedFriend struct {
 }
 
 type FriendsSummary struct {
-	Friends []Friend `json:"friends"`
-	Incoming []PendingFriend `json:"incoming"`
-	Outgoing []PendingFriend `json:"outgoing"`
+	Friends   []Friend          `json:"friends"`
+	Incoming  []PendingFriend   `json:"incoming"`
+	Outgoing  []PendingFriend   `json:"outgoing"`
 	Suggested []SuggestedFriend `json:"suggested"`
-	Blocklist []interface{} `json:"blocklist"`
+	Blocklist []interface{}     `json:"blocklist"`
 	Settings  struct {
 		AcceptInvites string `json:"acceptInvites"`
 		MutualPrivacy string `json:"mutualPrivacy"`
