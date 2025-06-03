@@ -90,6 +90,8 @@ type DeviceAuth struct {
 
 type Exchange eos.Exchange
 
+type DeviceAuthorization eos.DeviceAuthorization
+
 type UserCredentials struct {
 	AccessToken      string    `json:"access_token"`
 	AccountID        string    `json:"account_id"`
@@ -149,6 +151,42 @@ func (c Client) GetExchangeCode(credentials UserCredentials) (exchange Exchange,
 	res, err := request.ResponseParser[Exchange](resp)
 
 	return res.Body, err
+}
+
+func (c Client) GetDeviceCode(credentials ClientCredentials) (deviceAuth DeviceAuthorization, err error) {
+	headers := http.Header{}
+	headers.Set("Content-Type", "application/x-www-form-urlencoded")
+	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
+
+	v := url.Values{}
+	v.Set("prompt", "login")
+	body := v.Encode()
+
+	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/deviceAuthorization", headers, body)
+	if err != nil {
+		return
+	}
+
+	res, err := request.ResponseParser[DeviceAuthorization](resp)
+
+	return res.Body, err
+}
+
+func (c Client) WaitForDeviceCodeAccept(ac AuthClient, deviceCode string) (credentials UserCredentials, err error) {
+	credentials, err = c.Login(ac, LoginBuilder(AuthPayloadDeviceCode{
+		DeviceCode: deviceCode,
+	}))
+
+	if err != nil {
+		if err.(*request.Error[EpicErrorResponse]).Raw.ErrorCode == consts.ErrorAuthorizationPending {
+			time.Sleep(10 * time.Second)
+			return c.WaitForDeviceCodeAccept(ac, deviceCode)
+		}
+
+		return
+	}
+
+	return
 }
 
 type BuiltAuthPayload struct {
