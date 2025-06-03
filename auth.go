@@ -178,7 +178,7 @@ func (c Client) WaitForDeviceCodeAccept(ac AuthClient, deviceCode string) (crede
 	}))
 
 	if err != nil {
-		if err.(*request.Error[EpicErrorResponse]).Raw.ErrorCode == consts.ErrorAuthorizationPending {
+		if err.(*request.Error[eos.EpicErrorResponse]).Raw.ErrorCode == consts.ErrorAuthorizationPending {
 			time.Sleep(10 * time.Second)
 			return c.WaitForDeviceCodeAccept(ac, deviceCode)
 		}
