@@ -17,6 +17,55 @@ type AuthClient struct {
 	ClientSecret string
 }
 
+type AuthPayloadAuthorizationCode struct {
+	Code string `json:"code"`
+}
+
+type AuthPayloadContinuationToken struct {
+	ContinuationToken string `json:"continuation_token"`
+}
+
+type AuthPayloadDeviceAuth struct {
+	AccountID string `json:"account_id"`
+	DeviceID  string `json:"device_id"`
+	Secret    string `json:"secret"`
+}
+
+type AuthPayloadDeviceCode struct {
+	DeviceCode string `json:"device_code"`
+}
+
+type AuthPayloadExchangeCode struct {
+	ExchangeCode string `json:"exchange_code"`
+}
+
+type AuthPayloadExternalAuth struct {
+	ExternalAuthToken string `json:"external_auth_token"`
+}
+
+type AuthPayloadOTP struct {
+	OTP string `json:"otp"`
+}
+
+type AuthPayloadPassword struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type AuthPayloadRefreshToken struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+type AuthPayloadTokenToToken struct {
+	AccessToken string `json:"access_token"`
+}
+
+type AuthPayload interface {
+	AuthPayloadAuthorizationCode | AuthPayloadContinuationToken | AuthPayloadDeviceAuth |
+	AuthPayloadDeviceCode | AuthPayloadExchangeCode | AuthPayloadExternalAuth | AuthPayloadOTP |
+	AuthPayloadPassword | AuthPayloadRefreshToken | AuthPayloadTokenToToken
+}
+
 func (ac *AuthClient) String() string {
 	return fmt.Sprintf("AuthClient{ClientId: %s}", ac.ClientId)
 }
@@ -99,6 +148,69 @@ func (c Client) GetExchangeCode(credentials UserCredentials) (exchange Exchange,
 
 	res, err := request.ResponseParser[Exchange](resp)
 
+	return res.Body, err
+}
+
+type BuiltAuthPayload struct {
+	raw interface{}
+}
+
+func LoginBuilder[T AuthPayload](payload T) BuiltAuthPayload {
+	return BuiltAuthPayload{raw: payload}
+}
+
+func (c Client) Login(ac AuthClient, payload BuiltAuthPayload) (credentials UserCredentials, err error) {
+	headers := http.Header{}
+	headers.Set("Content-Type", "application/x-www-form-urlencoded")
+	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
+
+	v := url.Values{}
+
+	switch p := payload.raw.(type) {
+	case AuthPayloadAuthorizationCode:
+		v.Set("grant_type", "authorization_code")
+		v.Set("code", p.Code)
+	case AuthPayloadContinuationToken:
+		v.Set("grant_type", "continuation_token")
+		v.Set("continuation_token", p.ContinuationToken)
+	case AuthPayloadDeviceAuth:
+		v.Set("grant_type", "device_auth")
+		v.Set("account_id", p.AccountID)
+		v.Set("device_id", p.DeviceID)
+		v.Set("secret", p.Secret)
+	case AuthPayloadDeviceCode:
+		v.Set("grant_type", "device_code")
+		v.Set("device_code", p.DeviceCode)
+	case AuthPayloadExchangeCode:
+		v.Set("grant_type", "exchange_code")
+		v.Set("exchange_code", p.ExchangeCode)
+	case AuthPayloadExternalAuth:
+		v.Set("grant_type", "external_auth")
+		v.Set("external_auth_token", p.ExternalAuthToken)
+	case AuthPayloadOTP:
+		v.Set("grant_type", "otp")
+		v.Set("otp", p.OTP)
+	case AuthPayloadPassword:
+		v.Set("grant_type", "password")
+		v.Set("username", p.Username)
+		v.Set("password", p.Password)
+	case AuthPayloadRefreshToken:
+		v.Set("grant_type", "refresh_token")
+		v.Set("refresh_token", p.RefreshToken)
+	case AuthPayloadTokenToToken:
+		v.Set("grant_type", "token_to_token")
+		v.Set("access_token", p.AccessToken)
+	default:
+		return UserCredentials{}, fmt.Errorf("unsupported payload type: %T", payload)
+	}
+
+	body := v.Encode()
+	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/token", headers, body)
+	if err != nil {
+		return
+	}
+
+	res, err := request.ResponseParser[UserCredentials](resp)
 	return res.Body, err
 }
 

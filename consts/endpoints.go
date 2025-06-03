@@ -23,6 +23,5 @@ const (
 	EOS_AUTH      = EOS_SERVICE + "/oauth/v2"
 	FORTNITE_GAME = FORTNITE_SERVICE + "/fortnite/api/game/v2"
 
-	NITESTATS_API = "https://api.nitestats.com/v1/epic"
-	FNAPICOM_API  = ""
+	FNAPICOM_API = ""
 )
