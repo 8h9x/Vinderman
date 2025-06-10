@@ -1,3 +1,3 @@
-module gitlab.com/8h9x/Vinderman
+module gitlab.com/8h9x/vinderman
 
-go 1.24
+go 1.24.4

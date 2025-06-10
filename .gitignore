@@ -1,3 +1,5 @@
-.fleet
+# Editor files
 .idea
+
+# Testing
 test

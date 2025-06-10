@@ -3,23 +3,19 @@ package vinderman
 import (
 	"encoding/base64"
 	"fmt"
-	"gitlab.com/8h9x/Vinderman/consts"
+	"gitlab.com/8h9x/vinderman/consts"
+	"gitlab.com/8h9x/vinderman/request"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
-
-	"gitlab.com/8h9x/Vinderman/eos"
-	"gitlab.com/8h9x/Vinderman/request"
 )
-
-type AuthClient struct {
-	ClientId     string
-	ClientSecret string
-}
 
 type AuthPayloadAuthorizationCode struct {
 	Code string `json:"code"`
 }
+
+type AuthPayloadClientCredentials struct{}
 
 type AuthPayloadContinuationToken struct {
 	ContinuationToken string `json:"continuation_token"`
@@ -61,234 +57,163 @@ type AuthPayloadTokenToToken struct {
 }
 
 type AuthPayload interface {
-	AuthPayloadAuthorizationCode | AuthPayloadContinuationToken | AuthPayloadDeviceAuth |
-	AuthPayloadDeviceCode | AuthPayloadExchangeCode | AuthPayloadExternalAuth | AuthPayloadOTP |
-	AuthPayloadPassword | AuthPayloadRefreshToken | AuthPayloadTokenToToken
+	AuthPayloadAuthorizationCode | AuthPayloadClientCredentials | AuthPayloadContinuationToken |
+		AuthPayloadDeviceAuth | AuthPayloadDeviceCode | AuthPayloadExchangeCode | AuthPayloadExternalAuth |
+		AuthPayloadOTP | AuthPayloadPassword | AuthPayloadRefreshToken | AuthPayloadTokenToToken
 }
 
-func (ac *AuthClient) String() string {
-	return fmt.Sprintf("AuthClient{ClientId: %s}", ac.ClientId)
-}
-
-func (ac *AuthClient) BasicToken() string {
-	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ac.ClientId, ac.ClientSecret)))
-}
-
-type ClientCredentials eos.ClientCredentials
-
-type DeviceAuth struct {
-	AccountID string `json:"accountId"`
-	Created   struct {
-		DateTime  time.Time `json:"dateTime"`
-		IpAddress string    `json:"ipAddress"`
-		Location  string    `json:"location"`
-	} `json:"created"`
-	DeviceId  string `json:"deviceId"`
-	Secret    string `json:"secret"`
-	UserAgent string `json:"userAgent"`
-}
-
-type Exchange eos.Exchange
-
-type DeviceAuthorization eos.DeviceAuthorization
-
-type UserCredentials struct {
-	AccessToken      string    `json:"access_token"`
-	AccountID        string    `json:"account_id"`
-	ApplicationId    string    `json:"application_id"`
-	ClientId         string    `json:"client_id"`
-	ExpiresAt        time.Time `json:"expires_at"`
-	ExpiresIn        int       `json:"expires_in"`
-	RefreshExpiresAt time.Time `json:"refresh_expires_at"`
-	RefreshExpiresIn int       `json:"refresh_expires_in"`
-	RefreshToken     string    `json:"refresh_token"`
-	Scope            []string  `json:"scope"`
-	TokenType        string    `json:"token_type"`
-}
-
-func (c Client) CreateDeviceAuth(credentials UserCredentials) (deviceAuth DeviceAuth, err error) {
-	headers := http.Header{}
-	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
-
-	resp, err := c.Request("POST", fmt.Sprintf("%s/account/api/public/account/%s/deviceAuth", consts.ACCOUNT_SERVICE, credentials.AccountID), headers, "")
-	if err != nil {
-		return
-	}
-
-	res, err := request.ResponseParser[DeviceAuth](resp)
-
-	return res.Body, err
-}
-
-func (c Client) GetClientCredentials(ac AuthClient) (credentials ClientCredentials, err error) {
-	headers := http.Header{}
-	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
-
+func Authenticate[T AuthPayload](clientId, clientSecret string, payload T, eg1 bool) (AuthTokenResponse, error) {
 	v := url.Values{}
-	v.Set("grant_type", "client_credentials")
-	body := v.Encode()
-
-	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/token", headers, body)
-	if err != nil {
-		return
+	if eg1 == true {
+		v.Set("token_type", "eg1")
 	}
 
-	res, err := request.ResponseParser[ClientCredentials](resp)
-
-	return res.Body, err
-}
-
-func (c Client) GetExchangeCode(credentials UserCredentials) (exchange Exchange, err error) {
-	headers := http.Header{}
-	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
-
-	resp, err := c.Request("GET", consts.ACCOUNT_AUTH+"/exchange", headers, "")
-	if err != nil {
-		return
-	}
-
-	res, err := request.ResponseParser[Exchange](resp)
-
-	return res.Body, err
-}
-
-func (c Client) GetDeviceCode(credentials ClientCredentials) (deviceAuth DeviceAuthorization, err error) {
-	headers := http.Header{}
-	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
-
-	v := url.Values{}
-	v.Set("prompt", "login")
-	body := v.Encode()
-
-	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/deviceAuthorization", headers, body)
-	if err != nil {
-		return
-	}
-
-	res, err := request.ResponseParser[DeviceAuthorization](resp)
-
-	return res.Body, err
-}
-
-func (c Client) WaitForDeviceCodeAccept(ac AuthClient, deviceCode string) (credentials UserCredentials, err error) {
-	credentials, err = c.Login(ac, LoginBuilder(AuthPayloadDeviceCode{
-		DeviceCode: deviceCode,
-	}))
-
-	if err != nil {
-		if err.(*request.Error[eos.EpicErrorResponse]).Raw.ErrorCode == consts.ErrorAuthorizationPending {
-			time.Sleep(10 * time.Second)
-			return c.WaitForDeviceCodeAccept(ac, deviceCode)
-		}
-
-		return
-	}
-
-	return
-}
-
-type BuiltAuthPayload struct {
-	raw interface{}
-}
-
-func LoginBuilder[T AuthPayload](payload T) BuiltAuthPayload {
-	return BuiltAuthPayload{raw: payload}
-}
-
-func (c Client) Login(ac AuthClient, payload BuiltAuthPayload) (credentials UserCredentials, err error) {
-	headers := http.Header{}
-	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
-
-	v := url.Values{}
-
-	switch p := payload.raw.(type) {
+	switch p := any(payload).(type) {
 	case AuthPayloadAuthorizationCode:
 		v.Set("grant_type", "authorization_code")
 		v.Set("code", p.Code)
+		break
+	case AuthPayloadClientCredentials:
+		v.Set("grant_type", "client_credentials")
+		break
 	case AuthPayloadContinuationToken:
 		v.Set("grant_type", "continuation_token")
 		v.Set("continuation_token", p.ContinuationToken)
+		break
 	case AuthPayloadDeviceAuth:
 		v.Set("grant_type", "device_auth")
 		v.Set("account_id", p.AccountID)
 		v.Set("device_id", p.DeviceID)
 		v.Set("secret", p.Secret)
+		break
 	case AuthPayloadDeviceCode:
 		v.Set("grant_type", "device_code")
 		v.Set("device_code", p.DeviceCode)
+		break
 	case AuthPayloadExchangeCode:
 		v.Set("grant_type", "exchange_code")
 		v.Set("exchange_code", p.ExchangeCode)
+		break
 	case AuthPayloadExternalAuth:
 		v.Set("grant_type", "external_auth")
 		v.Set("external_auth_token", p.ExternalAuthToken)
+		break
 	case AuthPayloadOTP:
 		v.Set("grant_type", "otp")
 		v.Set("otp", p.OTP)
+		break
 	case AuthPayloadPassword:
 		v.Set("grant_type", "password")
 		v.Set("username", p.Username)
 		v.Set("password", p.Password)
+		break
 	case AuthPayloadRefreshToken:
 		v.Set("grant_type", "refresh_token")
 		v.Set("refresh_token", p.RefreshToken)
+		break
 	case AuthPayloadTokenToToken:
 		v.Set("grant_type", "token_to_token")
 		v.Set("access_token", p.AccessToken)
-	default:
-		return UserCredentials{}, fmt.Errorf("unsupported payload type: %T", payload)
+		break
 	}
 
-	body := v.Encode()
-	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/token", headers, body)
+	httpClient := &http.Client{}
+	req, err := http.NewRequest("POST", consts.AccountProxyService+"/account/api/oauth/token", strings.NewReader(v.Encode()))
 	if err != nil {
-		return
+		return AuthTokenResponse{}, err
 	}
 
-	res, err := request.ResponseParser[UserCredentials](resp)
-	return res.Body, err
-}
+	basicToken := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", clientId, clientSecret)))
 
-func (c Client) RefreshTokenLogin(ac AuthClient, refreshToken string) (credentials UserCredentials, err error) {
-	headers := http.Header{}
-	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", fmt.Sprint("Basic ", basicToken))
 
-	v := url.Values{}
-	v.Set("grant_type", "refresh_token")
-	v.Set("refresh_token", refreshToken)
-	body := v.Encode()
-
-	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/token", headers, body)
+	resp, err := httpClient.Do(req)
 	if err != nil {
-		return
+		return AuthTokenResponse{}, err
 	}
 
-	res, err := request.ResponseParser[UserCredentials](resp)
+	res, err := request.ResponseParser[AuthTokenResponse](resp)
+	if err != nil {
+		return AuthTokenResponse{}, err
+	}
 
 	return res.Body, err
 }
 
-func (c Client) ExchangeCodeLogin(ac AuthClient, code string) (credentials UserCredentials, err error) {
-	headers := http.Header{}
-	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	headers.Set("Authorization", fmt.Sprint("Basic ", ac.BasicToken()))
+type AuthTokenResponse struct {
+	AccessToken      string    `json:"access_token"`
+	ExpiresIn        int       `json:"expires_in"`
+	ExpiresAt        time.Time `json:"expires_at"`
+	TokenType        string    `json:"token_type"`
+	RefreshToken     string    `json:"refresh_token,omitempty"`
+	RefreshExpires   int       `json:"refresh_expires,omitempty"`
+	RefreshExpiresAt time.Time `json:"refresh_expires_at,omitempty"`
+	AccountId        string    `json:"account_id,omitempty"`
+	ClientId         string    `json:"client_id"`
+	InternalClient   bool      `json:"internal_client"`
+	ClientService    string    `json:"client_service"`
+	DisplayName      string    `json:"displayName,omitempty"`
+	App              string    `json:"app,omitempty"`
+	InAppId          string    `json:"in_app_id,omitempty"`
+	DeviceId         string    `json:"device_id,omitempty"`
+	ProductId        string    `json:"product_id"`
+	ApplicationId    string    `json:"application_id"`
+	Acr              string    `json:"acr,omitempty"`
+	AuthTime         time.Time `json:"auth_time,omitempty"`
+}
 
-	v := url.Values{}
-	v.Set("grant_type", "exchange_code")
-	v.Set("exchange_code", code)
-	v.Set("scope", "offline_access")
-	body := v.Encode()
+func VerifyToken(accessToken string, includePerms bool) (AuthVerifyResponse, error) {
+	httpClient := &http.Client{}
 
-	resp, err := c.Request("POST", consts.ACCOUNT_AUTH+"/token", headers, body)
+	req, err := http.NewRequest("GET", consts.AccountProxyService+"/account/api/oauth/verify?", nil)
 	if err != nil {
-		return
+		return AuthVerifyResponse{}, err
 	}
 
-	res, err := request.ResponseParser[UserCredentials](resp)
+	req.Header.Set("Authorization", fmt.Sprint("Bearer ", accessToken))
+
+	if includePerms == true {
+		req.URL.Query().Set("includePerms", "true")
+	}
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return AuthVerifyResponse{}, err
+	}
+
+	res, err := request.ResponseParser[AuthVerifyResponse](resp)
+	if err != nil {
+		return AuthVerifyResponse{}, err
+	}
 
 	return res.Body, err
+}
+
+type AuthVerifyResponse struct {
+	Token          string    `json:"token"`
+	SessionId      string    `json:"session_id"`
+	TokenType      string    `json:"token_type"`
+	ClientId       string    `json:"client_id"`
+	InternalClient bool      `json:"internal_client"`
+	ClientService  string    `json:"client_service"`
+	AccountId      string    `json:"account_id"`
+	ExpiresIn      int       `json:"expires_in"`
+	ExpiresAt      time.Time `json:"expires_at"`
+	AuthMethod     string    `json:"auth_method"`
+	DisplayName    string    `json:"display_name"`
+	App            string    `json:"app"`
+	InAppId        string    `json:"in_app_id"`
+	DeviceId       string    `json:"device_id"`
+	Scope          []string  `json:"scope"`
+	ProductId      string    `json:"product_id"`
+	SandboxId      string    `json:"sandbox_id"`
+	DeploymentId   string    `json:"deployment_id"`
+	ApplicationId  string    `json:"application_id"`
+	Acr            string    `json:"acr"`
+	AuthTime       time.Time `json:"auth_time"`
+	Perms          []struct {
+		Resource string `json:"resource"`
+		Action   string `json:"action"`
+	} `json:"perms"`
 }
