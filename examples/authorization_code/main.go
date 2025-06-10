@@ -1,12 +1,3 @@
-# Vinderman
-
-A library for making requests to Epic Games APIs--primarily targeting fortnite related endpoints.
-
-Installation: `go get gitlab.com/8h9x/vinderman`
-
-Simple client creation example: 
-#### `/examples/authorization_code/main.go`
-```go
 package main
 
 import (
@@ -45,4 +36,3 @@ func main() {
 
 	log.Println("Vinderman client successfully created")
 }
-```

@@ -62,7 +62,7 @@ type Payload interface {
 		PayloadOTP | PayloadPassword | PayloadRefreshToken | PayloadTokenToToken
 }
 
-func Authenticate[T Payload](clientId, clientSecret string, payload T, eg1 bool) (TokenResponse, error) {
+func Authenticate[T Payload](httpClient *http.Client, clientId, clientSecret string, payload T, eg1 bool) (TokenResponse, error) {
 	v := url.Values{}
 	if eg1 == true {
 		v.Set("token_type", "eg1")
@@ -117,7 +117,6 @@ func Authenticate[T Payload](clientId, clientSecret string, payload T, eg1 bool)
 		break
 	}
 
-	httpClient := &http.Client{}
 	req, err := http.NewRequest("POST", consts.AccountProxyService+"/account/api/oauth/token", strings.NewReader(v.Encode()))
 	if err != nil {
 		return TokenResponse{}, err
@@ -163,8 +162,7 @@ type TokenResponse struct {
 	AuthTime         time.Time `json:"auth_time"`
 }
 
-func VerifyToken(accessToken string, includePerms bool) (VerifyTokenResponse, error) {
-	httpClient := &http.Client{}
+func VerifyToken(httpClient *http.Client, accessToken string, includePerms bool) (VerifyTokenResponse, error) {
 	v := url.Values{}
 
 	if includePerms {
@@ -217,4 +215,70 @@ type VerifyTokenResponse struct {
 		Resource string `json:"resource"`
 		Action   string `json:"action"`
 	} `json:"perms"`
+}
+
+func CreateDeviceAuth(httpClient *http.Client, credentials TokenResponse) (DeviceAuthResponse, error) {
+	req, err := http.NewRequest("POST", consts.AccountService+"/account/api/public/account/"+credentials.AccountId+"/deviceAuth", nil)
+	if err != nil {
+		return DeviceAuthResponse{}, err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return DeviceAuthResponse{}, err
+	}
+
+	res, err := request.ResponseParser[DeviceAuthResponse](resp)
+	if err != nil {
+		return DeviceAuthResponse{}, err
+	}
+
+	headers := http.Header{}
+	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
+
+	return res.Body, err
+}
+
+type DeviceAuthResponse struct {
+	AccountID string `json:"accountId"`
+	Created   struct {
+		DateTime  time.Time `json:"dateTime"`
+		IpAddress string    `json:"ipAddress"`
+		Location  string    `json:"location"`
+	} `json:"created"`
+	DeviceId  string `json:"deviceId"`
+	Secret    string `json:"secret"`
+	UserAgent string `json:"userAgent"`
+}
+
+func GetExchangeCode(httpClient *http.Client, credentials TokenResponse) (ExchangeResponse, error) {
+	req, err := http.NewRequest("POST", consts.AccountService+"/account/api/oauth/exchange", nil)
+	if err != nil {
+		return ExchangeResponse{}, err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return ExchangeResponse{}, err
+	}
+
+	res, err := request.ResponseParser[ExchangeResponse](resp)
+	if err != nil {
+		return ExchangeResponse{}, err
+	}
+
+	headers := http.Header{}
+	headers.Set("Authorization", fmt.Sprint("Bearer ", credentials.AccessToken))
+
+	return res.Body, err
+}
+
+type ExchangeResponse struct {
+	Code             string `json:"code"`
+	CreatingClientId string `json:"creatingClientId"`
+	ExpiresInSeconds int    `json:"expiresInSeconds"`
 }

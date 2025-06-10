@@ -23,7 +23,7 @@ func NewClient(httpClient *http.Client, initCredentials auth.TokenResponse) (*Cl
 
 	client.CredentialsMap[initCredentials.ClientId] = initCredentials
 
-	_, err := auth.VerifyToken(initCredentials.AccessToken, false)
+	_, err := auth.VerifyToken(httpClient, initCredentials.AccessToken, false)
 	if err != nil {
 		return client, err
 	}
